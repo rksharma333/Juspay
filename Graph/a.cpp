@@ -1,59 +1,59 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Code for BFS
-
-void bfs(int n, int node, vector<int> adj[], vector<int> &ans)
+class Node
 {
-      vector<int> vis(n, 0);
-      queue<int> q;
-      q.push(node);
-      vis[node] = 1;
-
-      while (!q.empty())
+public:
+      Node *parent;          //for keeping track of par
+      int data;              //value for node
+      vector<Node *> childs; //childs of node
+      Node(int val)
       {
-            int it = q.front();
-            q.pop();
-            ans.push_back(it);
+            data = val;
+      }
+};
 
-            for (auto child : adj[it])
-            {
-                  if (!vis[child])
-                  {
-                        vis[child] = 1;
-                        q.push(child);
-                  }
-            }
+void printTree(Node * node)
+{
+      string str = to_string(node->data) + "->>";
+      for(auto child : node->childs)
+      {
+            str += to_string(child->data) + " ";
+      }
+      cout<<str<<endl;
+      for(auto child : node->childs)
+      {
+            printTree(child);
       }
 }
 
 int main()
 {
-      int n;
-      cin >> n;
+      vector<int> arr = {10, 20, 50, -1, 60, -1, -1, 30, 70, -1, 80, 110, -1, 100, -1, -1, 90, -1, -1, 40, 100, -1, -1, -1};
+      stack<Node *> st;
+      Node *root = nullptr;
 
-      vector<int> adj[n];
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < arr.size(); i++)
       {
-            int e;
-            cin >> e;
+            if (arr[i] == -1 && !st.empty())
+                  st.pop();
+            else
+            {
+                  Node *child = new Node(arr[i]); // making of child node
 
-            if (e != -1)
-                  adj[i].push_back(e);
+                  if (st.size() > 0)
+                  {
+                        Node *par = st.top();
+                        child->parent = par; //
+
+                        par->childs.push_back(child);
+                  }
+                  else
+                  {
+                        root = child;
+                  }
+                  st.push(child);
+            }
       }
-
-      int u, v;
-      cin >> u >> v;
-
-      vector<int> path1, path2;
-
-      bfs(n, u, adj, path1);
-      bfs(n, v, adj, path2);
-
-      for (auto it : path1)
-            cout << it << " ";
-      cout << endl;
-
-      for (auto it : path2)
-            cout << it << " ";
+      printTree(root);
 }
